@@ -22,7 +22,6 @@ urlcolor: blue
 -------------------
 
 
-#Hierarchical clustering
 The data that we'll work with is the Wine Quality Data Set from the UCI Machine Learning Repository. It consists of 4898 observations of 12 atttribute measures based on phsysiochemical tests:
 
 1 - fixed acidity
@@ -50,7 +49,7 @@ The data that we'll work with is the Wine Quality Data Set from the UCI Machine 
 There is one response variable based on sensory data: `quality`, which is measured by a score between 0 and 10.
 
 
-#Step 1: Load the Necessary Packages
+##Step 1: Load the Necessary Packages
 
 We will use the R package `cluster`, which provide methods for CLuster analysis, and the package `readr` to quickly read in our .csv file.
 ``` {r} 
@@ -58,52 +57,67 @@ library(readr)
 library(cluster)
 ```
 
-#Step 2: Load and Prep the Data
+##Step 2: Load and Prep the Data
 
 At a closer glance, the observations in our raw data file, 'winequality-white.csv', are separated by semicolons. We load in our data file in the chunk below, and eliminate any `NA` values. 
 
-We also use the function `scale()`, which centers and scales the columns of a numeric matrix. By default, its arguments `center` and `scale` are both set to `TRUE`.
+We also use the function `scale()`, which centers and scales the columns of a numeric matrix. By default, its arguments `center` and `scale` are both set to `TRUE`. If `center=TRUE`, centering is done by subtracting the column means of the data from their corresponding columns. If `scale=TRUE`, then scaling is done by dividing the (centered) columns of the data by their standard deviations (if `center =TRUE`). This results in each variable having a mean of 0 and standard deviation of 1.
+
 ``` {r}
-wine <- read.csv('winequality-white.csv', sep=';')
+wine <- read.csv('/Users/hannahli/Documents/GitHub/vignette-clustering/data/winequality-white.csv', sep=';')
 wine<-na.omit(wine)
 wine2 <- scale(wine)
 head(wine2)
 ```
 
-#We will cut down the wine data set due to run time and simplicity of the dendrogram
+
+#Hierarchical clustering
+
+Hierarchical clustering is an alternative to k-means clustering, a method of clustering that requires a pre-specified number of clusters $K$. Hierarchical clustering additionally produces a dendrogram, a tree-like representation of the similarity between observations,
+
+Hierarchical clustering is an unsupervised learning technique to divide a dataset into clusters of observations, where each cluster contains observations that are 'close' to each other and clusters are 'far' from each other by a certain measure.
+
+
+We will begin by using a sample 50 observations from the wine data set to reduce run time and make our visualizations (dendrograms) simpler.
 ``` {r}
 set.seed(100)
 w_ind <- sample(nrow(wine2),50,replace = F)
 winecut <- wine[w_ind,]
 ```
 
-#using the agnes() function from cluster package
-#Since we don’t know beforehand which method will produce the best clusters,
-#we can write a short function to perform hierarchical clustering using several different methods.
-#this function calculates the agglomerative coefficient of each method, which is metric that measures the strength of the clusters. 
-#The closer this value is to 1, the stronger the clusters.
+We will use the `agnes()` function from cluster package in R which computes agglomerative hierarchical clustering of the data. This function has two arguments, `data`, and `method`, which is a character string specifying the clustering method:
 
-#Step 3: Find the Linkage Method to Use
-#define linkage methods
-``` {r} 
-m <- c( "average", "single", "complete", "ward")
-names(m) <- c( "average", "single", "complete", "ward")
-```
-#function to compute agglomerative coefficient
+- `"average"`: default method
+
+- `"single"`: single linkage
+
+- `"complete"`: complete linkage
+
+- `"ward"`: Ward's method
+
+- `"weighted"`: weighted average linkage and its generalization `"flexible"`
+
+- `"gaverage"`: a generalized `"average"`
+
+Since we don’t know beforehand which method will produce the best clusters, we can write a short function below to perform hierarchical clustering using several different methods. The function computes the agglomerative coefficient of each clustering method, which measures the strength of the clusters. The closer this value is to 1, the stronger the clusters are.
 ``` {r} 
 ac <- function(x) {
   agnes(winecut, method = x)$ac
 }
 ```
 
-#calculate agglomerative coefficient for each clustering linkage method
-``` {r}
+#Step 3: Find the Linkage Method to Use
+
+We first define the linkage methods we will run through the function, then calculate agglomerative coefficient for each clustering linkage method in the chunk below.
+``` {r} 
+m <- c( "average", "single", "complete", "ward")
+names(m) <- c( "average", "single", "complete", "ward")
+
 sapply(m, ac)
 ```
-#We can see that Ward’s minimum variance method produces the highest agglomerative coefficient, 
-#thus we’ll use that as the method for our final hierarchical clustering:
 
-#perform hierarchical clustering using Ward's minimum variance
+We can see that Ward’s minimum variance method produces the highest agglomerative coefficient, thus we’ll use that as the method for our final hierarchical clustering, which is performed in the chunk below.
+
 ``` {r}
 clust <- agnes(winecut, method = "ward")
 
@@ -113,8 +127,8 @@ pltree(clust, cex = 0.6, hang = -1, main = "Dendrogram")
 
 
 
+We have thus performed hierarchical clustering on the sample of 50 observations from the original `wine2` dataset. We now perform hierarchical clustering on the whole `wine2` dataset in the chunk below. We test various linkage methods and select
 
-#full data set
 ``` {r} 
 m <- c( "average", "single", "complete", "ward")
 names(m) <- c( "average", "single", "complete", "ward")
