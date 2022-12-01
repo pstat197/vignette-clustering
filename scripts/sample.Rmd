@@ -122,21 +122,10 @@ We can see that Ward's minimum variance method produces the highest agglomerativ
  pltree(clust, cex = 0.6, hang = -1, main = "Dendrogram")
 ```
 
-We have so far only worked with the sample of 50 observations from the original `wine2` dataset. We now test various linkage methods on the whole `wine2` dataset in the chunk below and produce a dendrogram based on Ward's linkage method.
-
-```{r}
-#m <- c( "average", "single", "complete", "ward") 
-#names(m) <- c( "average", "single", "complete", "ward") 
-#ac2 <- function(x) { agnes(wine2, method = x)$ac } 
-#sapply(m, ac2) 
-#clust2 <- agnes(wine2, method = "ward") 
-#pltree(clust2, cex = 0.6, hang = -1, main = "Dendrogram")
-```
-
 
 Each leaf at the bottom of the dendrogram represents an observation in the original dataset. As we move up the dendrogram from the bottom, observations that are similar to each other are fused together into a branch.
 
-#Step 4: Determine the Optimal Number of Clusters We will be calculating the optimal number of clusters on the whole `wine2` dataset using the gap statistic, which compares the total intra-cluster variation for different values of $k$ with their expected values for a distribution with no clustering, to determine how many clusters the observations should be grouped in
+#Step 4: Determine the Optimal Number of Clusters We will be calculating the optimal number of clusters using the gap statistic, which compares the total intra-cluster variation for different values of $k$ with their expected values for a distribution with no clustering, to determine how many clusters the observations should be grouped in
 
 We can calculate the gap statistic for each number of clusters using the `clusGap()` function from the cluster package along with a plot of Clusters vs. Gap Statistic using the `fviz_gap_stat()` function
 
@@ -150,7 +139,7 @@ fviz_gap_stat(gap_stat)
 
 We observe that the gap statistic is highest at $k=1$ and $k=2$Thus, we select $k=2$ clusters to divide our dataset.
 
-#Step 5: Apply Cluster Labels to Original Dataset To actually add cluster labels to each observation in our dataset, we can use the `cutree()` method to cut the dendrogram into 3 clusters:
+#Step 5: Apply Cluster Labels to the Dataset and add cluster labels to each observation in our dataset, we can use the `cutree()` method to cut the dendrogram into 3 clusters:
 
 
 ```{r}
