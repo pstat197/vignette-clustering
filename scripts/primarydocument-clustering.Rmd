@@ -14,13 +14,15 @@ urlcolor: blue
 >       - `kmeans()` function
 >       - Pros and cons 
 > - Hierachical clustering
->       - `hclust()` function
+>       - `...` function
 >       - Different linkages (complete, single, average)
 >       - Make a dendrogram
 >       - Plotting Dendrogram using `dendextend`
 
 -------------------
 
+
+#Hierarchical clustering
 The data that we'll work with is the Wine Quality Data Set from the UCI Machine Learning Repository. It consists of 4898 observations of 12 atttribute measures based on phsysiochemical tests:
 
 1 - fixed acidity
@@ -50,7 +52,7 @@ There is one response variable based on sensory data: `quality`, which is measur
 
 #Step 1: Load the Necessary Packages
 
-We will use the package `cluster` in R to 
+We will use the R package `cluster`, which provide methods for CLuster analysis, and the package `readr` to quickly read in our .csv file.
 ``` {r} 
 library(readr)
 library(cluster)
@@ -58,9 +60,9 @@ library(cluster)
 
 #Step 2: Load and Prep the Data
 
-At a closer glance, the observations in our raw data file, 'winequality-white.csv', are separated by semicolons.
+At a closer glance, the observations in our raw data file, 'winequality-white.csv', are separated by semicolons. We load in our data file in the chunk below, and eliminate any `NA` values. 
 
-#read in csv
+We also use the function `scale()`, which centers and scales the columns of a numeric matrix. By default, its arguments `center` and `scale` are both set to `TRUE`.
 ``` {r}
 wine <- read.csv('winequality-white.csv', sep=';')
 wine<-na.omit(wine)
