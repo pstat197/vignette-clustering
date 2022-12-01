@@ -1,0 +1,183 @@
+---
+title: 'Clustering Methods'
+output:
+  html_document:
+    df_print: paged
+subtitle: PSTAT 197A, Fall 2022
+header-includes: \usepackage{mathtools}
+urlcolor: blue
+---
+
+> ### Objectives
+>
+> - k-means clustering
+>       - `kmeans()` function
+>       - Pros and cons 
+> - Hierachical clustering
+>       - `...` function
+>       - Different linkages (complete, single, average)
+>       - Make a dendrogram
+>       - Plotting Dendrogram using `dendextend`
+
+-------------------
+
+
+The data that we'll work with is the Wine Quality Data Set from the UCI Machine Learning Repository. It consists of 4898 observations of 12 atttribute measures based on phsysiochemical tests:
+
+1 - fixed acidity
+
+2 - volatile acidity
+
+3 - citric acid
+
+4 - residual sugar
+
+5 - chlorides
+
+6 - free sulfur dioxide
+
+7 - total sulfur dioxide
+
+8 - density
+
+9 - pH
+
+10 - sulphates
+
+11 - alcohol
+
+There is one response variable based on sensory data: `quality`, which is measured by a score between 0 and 10.
+
+
+##Step 1: Load the Necessary Packages
+
+We will use the R package `cluster`, which provide methods for CLuster analysis, and the package `readr` to quickly read in our .csv file.
+``` {r} 
+library(readr)
+library(cluster)
+```
+
+##Step 2: Load and Prep the Data
+
+At a closer glance, the observations in our raw data file, 'winequality-white.csv', are separated by semicolons. We load in our data file in the chunk below, and eliminate any `NA` values. 
+
+We also use the function `scale()`, which centers and scales the columns of a numeric matrix. By default, its arguments `center` and `scale` are both set to `TRUE`. If `center=TRUE`, centering is done by subtracting the column means of the data from their corresponding columns. If `scale=TRUE`, then scaling is done by dividing the (centered) columns of the data by their standard deviations (if `center =TRUE`). This results in each variable having a mean of 0 and standard deviation of 1.
+
+``` {r}
+wine <- read.csv('/Users/hannahli/Documents/GitHub/vignette-clustering/data/winequality-white.csv', sep=';')
+wine<-na.omit(wine)
+wine2 <- scale(wine)
+head(wine2)
+```
+
+
+#Hierarchical clustering
+
+Hierarchical clustering is an alternative to k-means clustering, a method of clustering that requires a pre-specified number of clusters $K$. Hierarchical clustering additionally produces a dendrogram, a tree-like representation of the similarity between observations,
+
+Hierarchical clustering is an unsupervised learning technique to divide a dataset into clusters of observations, where each cluster contains observations that are 'close' to each other and clusters are 'far' from each other by a certain measure.
+
+
+We will begin by using a sample 50 observations from the wine data set to reduce run time and make our visualizations (dendrograms) simpler.
+``` {r}
+set.seed(100)
+w_ind <- sample(nrow(wine2),50,replace = F)
+winecut <- wine[w_ind,]
+```
+
+We will use the `agnes()` function from cluster package in R which computes agglomerative hierarchical clustering of the data. This function has two arguments, `data`, and `method`, which is a character string specifying the clustering method:
+
+- `"average"`: default method
+
+- `"single"`: single linkage
+
+- `"complete"`: complete linkage
+
+- `"ward"`: Ward's method
+
+- `"weighted"`: weighted average linkage and its generalization `"flexible"`
+
+- `"gaverage"`: a generalized `"average"`
+
+Since we don’t know beforehand which method will produce the best clusters, we can write a short function below to perform hierarchical clustering using several different methods. The function computes the agglomerative coefficient of each clustering method, which measures the strength of the clusters. The closer this value is to 1, the stronger the clusters are.
+``` {r} 
+ac <- function(x) {
+  agnes(winecut, method = x)$ac
+}
+```
+
+#Step 3: Find the Linkage Method to Use
+
+We first define the linkage methods we will run through the function, then calculate agglomerative coefficient for each clustering linkage method in the chunk below.
+``` {r} 
+m <- c( "average", "single", "complete", "ward")
+names(m) <- c( "average", "single", "complete", "ward")
+
+sapply(m, ac)
+```
+
+We can see that Ward’s minimum variance method produces the highest agglomerative coefficient, thus we’ll use that as the method for our final hierarchical clustering, which is performed in the chunk below.
+
+``` {r}
+clust <- agnes(winecut, method = "ward")
+
+#produce dendrogram
+pltree(clust, cex = 0.6, hang = -1, main = "Dendrogram") 
+```
+
+
+
+We have so far only worked with the sample of 50 observations from the original `wine2` dataset. We now test various linkage methods on the whole `wine2` dataset in the chunk below and produce a dendrogram based on Ward's linkage method.
+
+``` {r} 
+m <- c( "average", "single", "complete", "ward")
+names(m) <- c( "average", "single", "complete", "ward")
+ac2 <- function(x) {
+  agnes(wine2, method = x)$ac
+}
+sapply(m, ac2)
+clust2 <- agnes(wine2, method = "ward")
+pltree(clust2, cex = 0.6, hang = -1, main = "Dendrogram") 
+```
+
+Each leaf at the bottom of the dendrogram represents an observation in the original dataset. As we move up the dendrogram from the bottom, observations that are similar to each other are fused together into a branch.
+
+#Step 4: Determine the Optimal Number of Clusters
+We will be calculating the optimal number of clusters on the whole `wine2` dataset using the gap statistic, which compares the total intra-cluster variation for different values of $k$ with their expected values for a distribution with no clustering, to determine how many clusters the observations should be grouped in 
+
+We can calculate the gap statistic for each number of clusters using the `clusGap()` function from the cluster package along with a plot of Clusters vs. Gap Statistic using the `fviz_gap_stat()` function
+
+We calculate the gap statistic for each number of clusters (up to 10 clusters) in the code below:
+``` {r}
+gap_stat <- clusGap(wine2, FUN = hcut, nstart = 25, K.max = 10, B = 50)
+
+#produce plot of clusters vs. gap statistic
+fviz_gap_stat(gap_stat)
+```
+We observe that the gap statistic is highest at $k=1$ and $k=5$ clusters. Thus, we select $k=4$ clusters to divide our dataset.
+
+#Step 5: Apply Cluster Labels to Original Dataset
+To actually add cluster labels to each observation in our dataset, we can use the `cutree()` method to cut the dendrogram into 4 clusters:
+
+``` {r} 
+#compute distance matrix
+d <- dist(wine2, method = "euclidean")
+
+#perform hierarchical clustering using Ward's method
+final_clust <- hclust(d, method = "ward.D2" )
+
+#cut the dendrogram into 4 clusters
+groups <- cutree(final_clust, k=3)
+
+#find number of observations in each cluster
+table(groups)
+
+#append cluster labels to original data
+final_data <- cbind(wine, cluster = groups)
+
+#display first six rows of final data
+head(final_data)
+
+#compute mean of variables in each cluster
+aggregate(final_data, by=list(cluster=final_Data$cluster), mean)
+```
