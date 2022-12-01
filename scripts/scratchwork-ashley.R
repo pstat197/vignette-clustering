@@ -1,6 +1,7 @@
 #Step 1: Load the Necessary Packages
 library(readr)
 library(cluster)
+library(factoextra)
 
 #Step 2: Load and Prep the Data
 #read in csv
@@ -8,8 +9,9 @@ wine <- read.csv('winequality-white.csv', sep=';')
 wine<-na.omit(wine)
 wine2 <- scale(wine)
 head(wine2)
+save(wine2, file = "clean-winequality.RData")
 
-#We will cut down the wine data set due to run time and simplicity of the dendrogram
+#We will cut down the wine data set due to run time and simplicity of the dendrogram to 50 rows
 set.seed(100)
 w_ind <- sample(nrow(wine2),50,replace = F)
 winecut <- wine[w_ind,]
@@ -80,7 +82,7 @@ gap_stat <- clusGap(wine2, FUN = hcut, nstart = 25, K.max = 10, B = 50)
 #produce plot of clusters vs. gap statistic
 fviz_gap_stat(gap_stat)
 
-#our highest k is at 1 and 5
+#our highest k is at 3
 
 #Step 5: Apply Cluster Labels to Original Dataset
 #To actually add cluster labels to each observation in our dataset, 
@@ -104,3 +106,4 @@ final_data <- cbind(wine, cluster = groups)
 #display first six rows of final data
 head(final_data)
 
+#references: https://www.statology.org/hierarchical-clustering-in-r/
