@@ -14,8 +14,70 @@ knitr::opts_chunk$set(echo = TRUE)
 K-means clustering is an unsupervised learning method in machine learning (there is no response variable to evaluate the model off of). This method is used to group data points into K clusters where K is a tuning parameter chosen by the user. After initially randomly assigning data points to a cluster, the model iterates until the clusters are settled into their respective groups. The clustering is determined by the distance from the center of each cluster. The function used for k-means clustering is `kmeans()` found in the stats package.
 
 ```{r}
+#REFERENCE: https://uc-r.github.io/kmeans_clustering
 library(tidymodels)
+library(cluster)
+wine2 <- read_csv("C:/Users/ryanc/OneDrive/Desktop/PSTAT197A/vignette-clustering/data/clean-whitequality.csv")
+```
+```{r}
+#omit NA values, if there
+wine2 <- na.omit(wine2)
 
-data <- read_csv("C:/Users/ryanc/OneDrive/Desktop/PSTAT197A/vignette-clustering/data/winequality-white.csv")
+#cutting down data for faster and clearer dendrogram
+set.seed(100)
+w_ind <- sample(nrow(wine2),50,replace = F)
+winecut <- wine2[w_ind,]
+
+#Standardize residuals to control variability, otherwise a feature with a large range will skew
+wine_sc <- scale(winecut)
+
+#Pick distance measure, here I use Euclidean from the factoextra R package
+#install.packages("factoextra")
+library(factoextra)
+distance <- get_dist(wine_sc)
+#fviz_dist allows us to visualize the distance
+fviz_dist(distance, gradient = list(low = "#00AFBB", mid = "white", high = "#FC4E07"),show_labels = FALSE)
+```
+```{r}
+#kmeans function used below. Here, we are setting centers = 2 to form two different clusters. Addiionally, the nstart option will attempt to create initial configurations in order to find the best one. In this instance, there are 30 configurations
+kmeans2 <- kmeans(wine_sc, centers = 2, nstart = 30)
+str(kmeans2)
+```
+```{r}
+#Below you can see the two clusters, along with the cluster means
+kmeans2
+```
+```{r}
+#remember to remove labels
+fviz_cluster(kmeans2, data = wine_sc)
+
+```
+```{r}
+kmeans3 <- kmeans(wine_sc, centers = 3, nstart = 30)
+kmeans4 <- kmeans(wine_sc, centers = 4, nstart = 30)
+kmeans5 <- kmeans(wine_sc, centers = 5, nstart = 30)
+
+# plots to compare
+p1 <- fviz_cluster(kmeans2, geom = "point", data = wine_sc) + ggtitle("k = 2")
+p2 <- fviz_cluster(kmeans3, geom = "point",  data = wine_sc) + ggtitle("k = 3")
+p3 <- fviz_cluster(kmeans4, geom = "point",  data = wine_sc) + ggtitle("k = 4")
+p4 <- fviz_cluster(kmeans5, geom = "point",  data = wine_sc) + ggtitle("k = 5")
+
+library(gridExtra)
+grid.arrange(p1, p2, p3, p4, nrow = 2)
+```
+```{r}
+#So, Which is best? There are three methods we can use 
+#ELBOW
+fviz_nbclust(wine_sc, kmeans, method = "wss")
+#SILHOUETTE
+fviz_nbclust(wine_sc, kmeans,method = "silhouette")
+#GAP STATISTICS
+
+gap_stat <- clusGap(wine_sc, FUN = kmeans, nstart = 30,
+                    K.max = 10, B = 50)
+print(gap_stat, method = "firstmax")
+fviz_gap_stat(gap_stat)
+#2 clusters seems to be the best!!! !
 ```
 
