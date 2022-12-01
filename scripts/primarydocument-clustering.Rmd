@@ -21,21 +21,59 @@ urlcolor: blue
 
 -------------------
 
+The data that we'll work with is the Wine Quality Data Set from the UCI Machine Learning Repository. It consists of 4898 observations of 12 atttribute measures based on phsysiochemical tests:
+
+1 - fixed acidity
+
+2 - volatile acidity
+
+3 - citric acid
+
+4 - residual sugar
+
+5 - chlorides
+
+6 - free sulfur dioxide
+
+7 - total sulfur dioxide
+
+8 - density
+
+9 - pH
+
+10 - sulphates
+
+11 - alcohol
+
+There is one response variable based on sensory data: `quality`, which is measured by a score between 0 and 10.
+
+
 #Step 1: Load the Necessary Packages
+
+We will use the package `cluster` in R to 
+``` {r} 
 library(readr)
 library(cluster)
+```
 
 #Step 2: Load and Prep the Data
+
+At a closer glance, the observations in our raw data file, 'winequality-white.csv', are separated by semicolons.
+
 #read in csv
+``` {r}
 wine <- read.csv('winequality-white.csv', sep=';')
 wine<-na.omit(wine)
 wine2 <- scale(wine)
 head(wine2)
+```
 
 #We will cut down the wine data set due to run time and simplicity of the dendrogram
+``` {r}
 set.seed(100)
 w_ind <- sample(nrow(wine2),50,replace = F)
 winecut <- wine[w_ind,]
+```
 
 #using the agnes() function from cluster package
 #Since we don’t know beforehand which method will produce the best clusters,
@@ -45,31 +83,37 @@ winecut <- wine[w_ind,]
 
 #Step 3: Find the Linkage Method to Use
 #define linkage methods
+``` {r} 
 m <- c( "average", "single", "complete", "ward")
 names(m) <- c( "average", "single", "complete", "ward")
-
+```
 #function to compute agglomerative coefficient
+``` {r} 
 ac <- function(x) {
   agnes(winecut, method = x)$ac
 }
+```
 
 #calculate agglomerative coefficient for each clustering linkage method
+``` {r}
 sapply(m, ac)
-
+```
 #We can see that Ward’s minimum variance method produces the highest agglomerative coefficient, 
 #thus we’ll use that as the method for our final hierarchical clustering:
 
 #perform hierarchical clustering using Ward's minimum variance
+``` {r}
 clust <- agnes(winecut, method = "ward")
 
 #produce dendrogram
 pltree(clust, cex = 0.6, hang = -1, main = "Dendrogram") 
-
+```
 
 
 
 
 #full data set
+``` {r} 
 m <- c( "average", "single", "complete", "ward")
 names(m) <- c( "average", "single", "complete", "ward")
 ac2 <- function(x) {
@@ -78,7 +122,7 @@ ac2 <- function(x) {
 sapply(m, ac2)
 clust2 <- agnes(wine2, method = "ward")
 pltree(clust2, cex = 0.6, hang = -1, main = "Dendrogram") 
-
+```
 
 
 
@@ -98,11 +142,12 @@ pltree(clust2, cex = 0.6, hang = -1, main = "Dendrogram")
 #along with a plot of clusters vs. gap statistic using the fviz_gap_stat() function
 
 #calculate gap statistic for each number of clusters (up to 10 clusters)
+``` {r}
 gap_stat <- clusGap(wine2, FUN = hcut, nstart = 25, K.max = 10, B = 50)
 
 #produce plot of clusters vs. gap statistic
 fviz_gap_stat(gap_stat)
-
+```
 #our highest k is at 1 and 5
 
 #Step 5: Apply Cluster Labels to Original Dataset
@@ -110,6 +155,7 @@ fviz_gap_stat(gap_stat)
 #we can use the cutree() method to cut the dendrogram into 4 clusters:
 
 #compute distance matrix
+``` {r} 
 d <- dist(wine2, method = "euclidean")
 
 #perform hierarchical clustering using Ward's method
@@ -126,4 +172,4 @@ final_data <- cbind(wine, cluster = groups)
 
 #display first six rows of final data
 head(final_data)
-
+```
