@@ -11,8 +11,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # K-Means Clustering
 
-K-means clustering is an unsupervised learning method in machine learning (there is no response variable to evaluate the model off of). This method is used to group data points into K clusters where K is a tuning parameter chosen by the user. After initially randomly assigning data points to a cluster, the model iterates until the clusters are settled into their respective groups. The clustering is determined by the distance from the center of each cluster. The function used for k-means clustering is `kmeans()` found in the stats package.  
+K-means clustering is an unsupervised learning method in machine learning (there is no response variable to evaluate the model off of). This method is used to group data points into K clusters where K is a tuning parameter chosen by the user. After initially randomly assigning data points to a cluster, the model iterates until the clusters are settled into their respective groups. The clustering is determined by the distance from the center of each cluster. The function used for k-means clustering is `kmeans()` found in the stats package.
+
 ```{r}
-?kmeans
+library(tidymodels)
+
+data <- read_csv("C:/Users/ryanc/OneDrive/Desktop/PSTAT197A/vignette-clustering/data/winequality-white.csv")
 ```
 
