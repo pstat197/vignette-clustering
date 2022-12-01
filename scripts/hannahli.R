@@ -1,29 +1,8 @@
----
-title: 'Clustering Methods'
-output:
-  html_document:
-    df_print: paged
-subtitle: PSTAT 197A, Fall 2022
-header-includes: \usepackage{mathtools}
-urlcolor: blue
----
-
-> ### Objectives
->
-> - k-means clustering
->       - `kmeans()` function
->       - Pros and cons 
-> - Hierachical clustering
->       - `hclust()` function
->       - Different linkages (complete, single, average)
->       - Make a dendrogram
->       - Plotting Dendrogram using `dendextend`
-
--------------------
-
+#USING MATERIAL FROM scratchwork-ashley.R
 #Step 1: Load the Necessary Packages
 library(readr)
 library(cluster)
+library(tidyverse)
 
 #Step 2: Load and Prep the Data
 #read in csv
@@ -31,6 +10,7 @@ wine <- read.csv('winequality-white.csv', sep=';')
 wine<-na.omit(wine)
 wine2 <- scale(wine)
 head(wine2)
+glimpse(wine2)
 
 #We will cut down the wine data set due to run time and simplicity of the dendrogram
 set.seed(100)
