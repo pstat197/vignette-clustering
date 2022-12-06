@@ -9,19 +9,12 @@ Abstract: Clustering is an unsupervised machine learning model that involves gro
 Repository:
 
 -   Data -
-
-```{=html}
-<!-- -->
-```
 -   Scripts -
 
 References:
 
 -   [Hierarchical Clustering](https://www.statology.org/hierarchical-clustering-in-r/)
 
-```{=html}
-<!-- -->
-```
 -   [K-Means Clustering](https://towardsdatascience.com/understanding-k-means-clustering-in-machine-learning-6a6e67336aa1)
 
 -   [Additional Clustering Methods and Details](https://www.freecodecamp.org/news/8-clustering-algorithms-in-machine-learning-that-all-data-scientists-should-know/)
