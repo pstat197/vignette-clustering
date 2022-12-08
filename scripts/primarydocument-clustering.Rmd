@@ -14,7 +14,7 @@ urlcolor: blue
 >       - `kmeans()` function
 >       - Pros and cons 
 > - Hierachical clustering
->       - `...` function
+>       - `agnes()` function
 >       - Different linkages (complete, single, average)
 >       - Make a dendrogram
 >       - Plotting Dendrogram using `dendextend`

@@ -1,6 +1,7 @@
+*Vignette on k-means and hierarchical clustering; created as a class project for PSTAT197A in Fall 2022.*
+
 # vignette-clustering
 
-*Vignette on k-means and hierarchical clustering; created as a class project for PSTAT197A in Fall 2022.*
 
 Contributors: Ashley Son, Hannah Li, Ryan Quon, Alexander Lim
 
