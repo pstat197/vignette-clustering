@@ -2,6 +2,7 @@
 title: "Clustering Vignette"
 author: "Ashley Son, Hannah Li, Ryan Quon, Alex Lim" 
 format: html
+    html-math-method: katex
 editor: visual
 ---
 
@@ -81,7 +82,7 @@ We will initially begin by using a sample 50 observations from the wine data set
 ```{r}
 set.seed(100) 
 w_ind <- sample(nrow(wine2),50,replace = F) 
-winecut <- wine[w_ind,]
+winecut <- wine2[w_ind,]
 ```
 
 We will use the `agnes()` function from cluster package in R which computes agglomerative hierarchical clustering of the data. This function has two arguments, `data`, and `method`, which is a character string specifying the clustering method:
@@ -164,19 +165,52 @@ head(final_data)
 
 K-means clustering is an unsupervised learning method in machine learning (there is no response variable to evaluate the model off of). This method is used to group data points into K clusters where K is a tuning parameter chosen by the user. After initially randomly assigning data points to a cluster, the model iterates until the clusters are settled into their respective groups. The clustering is determined by the distance from the center of each cluster. The function used for k-means clustering is `kmeans()` found in the stats package.
 
+## Step 1: Pick distance measure
+
+In order to classify observations into clusters, we need to calculate the distance between each pair of observations. Each distance measure will yield different results so it is crucial that you choose these carefully.
+
+The first method I will go over is the distance between two points in Euclidean space, Euclidean Distance:
+
+$$d(x,y)=\sqrt{\sum_{i=1}^{n} (x_i-y_i)^2}$$
+
+This method is the most common and will most often be the default distance measure. Euclidean distance is often ideal since it will minimize squared errors, or in the context of K-means, minimize within-cluster variance. Alternatively, there is a close relative we can use: Manhattan Distance:
+
+$$d(x,y)={\sum_{i=1}^{n} |(x_i-y_i)|}$$
+
+This distance measure is far less common and should only be used when your data has high dimensionality. Other than these two approaches, you can also use correlation measures such as Pearson correlation distance or Spearman correlation distance.
+
+In order to calculate the Euclidean matrix, we will use the `get_dist` function from the `factoextra` package. We can alter the distance measure by changing the `method` argument.
+
 ```{r}
-#Pick distance measure, here I use Euclidean from the factoextra R package
+#Pick distance measure, here I use Euclidean from the factoextra R package 
 #install.packages("factoextra")
 library(factoextra)
-distance <- get_dist(wine_cut)
+#uses euclidean distance
+distance <- get_dist(winecut, method = "euclidean")
+```
+
+Now that we have the distances. It may be helpful to visualize them. The below code uses the fviz_dist() function to graph the distances between each subject.
+
+```{r}
 #fviz_dist allows us to visualize the distance
 fviz_dist(distance, gradient = list(low = "#00AFBB", mid = "white", high = "#FC4E07"),show_labels = FALSE)
 ```
 
+Just in case you forgot, the goal of kmeans clustering is to decrease the inter-cluster variation as much as possible so that the members of each cluster are as similar as possible. Each cluster is represented by the mean of all point, known as the centroid. The standard way to do this is using the Hartigan-Wong algorithm summarized in the following steps:
+
+1.  Partition data into random *k* sets
+
+2.  Randomly assign all of the data points to a centroid and calculate the respective means
+
+3.  For a datapoint $d_i$ select a centroid $c_i$*.* Assign $d_i$ to $c_i$ and compute the sum of squared distances. Then, repeat for every every centroid. After, assign $d_i$ to the centroid with the smallest sum. Finally, recalculate the new centroid means.
+
+4.  Repeat step 3 for every data point until convergence
+
+Now that we have an idea of how the algorithm works, we can use it. Here, we are setting `centers = 2` to form two different clusters. Additionally, the `nstart` option will create *n* initial figurations; the best of the initial figurations is chosen. In this instance, there are 30 intial configurations, `nstart = 30`.
+
 ```{r}
-#kmeans function used below. Here, we are setting centers = 2 to form two different clusters. Addiionally, the nstart option will attempt to create initial configurations in order to find the best one. In this instance, there are 30 configurations
-kmeans2 <- kmeans(wine_cut, centers = 2, nstart = 30)
-str(kmeans2)
+kmeans2 <- kmeans(winecut, centers = 2, nstart = 30) #labeled kmeans 2 since we have 2 clusters. We will use more later
+
 ```
 
 ```{r}
@@ -184,22 +218,24 @@ str(kmeans2)
 kmeans2
 ```
 
+This output gives us a lot of important data like the clusters in which each point is allocated, the center of all clusters, etc. As you can see, our wines were separated into clusters of sizes 28 and 22. The sum of squares for cluster 1 is 14913.96 and the sum of squares for cluster 2 is 20172.84. However, it may be easier to just look at a graph
+
 ```{r}
 #remember to remove labels
-fviz_cluster(kmeans2, data = wine_cut)
+fviz_cluster(kmeans2, data = winecut, geom=c("point"))#ensure geom is only equal to point, otherwise we will have labels
 
 ```
 
 ```{r}
-kmeans3 <- kmeans(wine_cut, centers = 3, nstart = 30)
-kmeans4 <- kmeans(wine_cut, centers = 4, nstart = 30)
-kmeans5 <- kmeans(wine_cut, centers = 5, nstart = 30)
+kmeans3 <- kmeans(winecut, centers = 3, nstart = 30)
+kmeans4 <- kmeans(winecut, centers = 4, nstart = 30)
+kmeans5 <- kmeans(winecut, centers = 5, nstart = 30)
 
 # plots to compare
-p1 <- fviz_cluster(kmeans2, geom = "point", data = wine_cut) + ggtitle("k = 2")
-p2 <- fviz_cluster(kmeans3, geom = "point",  data = wine_cut) + ggtitle("k = 3")
-p3 <- fviz_cluster(kmeans4, geom = "point",  data = wine_cut) + ggtitle("k = 4")
-p4 <- fviz_cluster(kmeans5, geom = "point",  data = wine_cut) + ggtitle("k = 5")
+p1 <- fviz_cluster(kmeans2, geom = "point", data = winecut) + ggtitle("k = 2")
+p2 <- fviz_cluster(kmeans3, geom = "point",  data = winecut) + ggtitle("k = 3")
+p3 <- fviz_cluster(kmeans4, geom = "point",  data = winecut) + ggtitle("k = 4")
+p4 <- fviz_cluster(kmeans5, geom = "point",  data = winecut) + ggtitle("k = 5")
 
 library(gridExtra)
 grid.arrange(p1, p2, p3, p4, nrow = 2)
@@ -208,12 +244,12 @@ grid.arrange(p1, p2, p3, p4, nrow = 2)
 ```{r}
 #So, Which is best? There are three methods we can use 
 #ELBOW
-fviz_nbclust(wine_cut, kmeans, method = "wss")
+fviz_nbclust(winecut, kmeans, method = "wss")
 #SILHOUETTE
-fviz_nbclust(wine_cut, kmeans,method = "silhouette")
+fviz_nbclust(winecut, kmeans,method = "silhouette")
 #GAP STATISTICS
 
-gap_stat <- clusGap(wine_cut, FUN = kmeans, nstart = 30,
+gap_stat <- clusGap(winecut, FUN = kmeans, nstart = 30,
                     K.max = 10, B = 50)
 print(gap_stat, method = "firstmax")
 fviz_gap_stat(gap_stat)
