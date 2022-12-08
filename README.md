@@ -3,16 +3,24 @@
 # vignette-clustering
 
 
-Contributors: Ashley Son, Hannah Li, Ryan Quon, Alexander Lim
+### Contributors: Ashley Son, Hannah Li, Ryan Quon, Alexander Lim
 
-Abstract: Clustering is an unsupervised machine learning model that involves grouping observations using various algorithms. This vignette covers 2 clustering methods: Hierarchical and K-means clustering. Using the UCI, quality of white wine dataset, both Hierarchical and K-means clustering are performed RESULTS HERE [Wine Quality Dataset](https://archive.ics.uci.edu/ml/datasets/Wine+Quality)
+## Abstract: 
 
-Repository:
-- vignette-clustering.qmd is the primary file that reviews the discussed clustering methods.
--   Data - This folder contains the raw and clean wine quality data.
--   Scripts - Scratchwork and practice code that was used to put together the final qmd file.
+Clustering is an unsupervised machine learning model that involves grouping observations using various algorithms. This vignette covers 2 clustering methods: Hierarchical and K-means clustering. Using the UCI, quality of white wine dataset, both Hierarchical and K-means clustering are performed RESULTS HERE [Wine Quality Dataset](https://archive.ics.uci.edu/ml/datasets/Wine+Quality)
 
-References:
+## Repository content
+
+-   `data` - contains 
+    -   `winequality-white.csv` contains 12 physicochemical test measures for 4,898 wines
+    -   `clean-winequality.RData` contains the scaled data from winequality-white.csv with missing values removed.
+-   `scripts` -
+    -   `primarydocument-clustering.Rmd`
+    -   `drafts` contains scratchwork files `scratchwork-ashley.R`, `scratchwork-hierarchial.R`, and `scratchwork-kmeans.Rmd`
+    -   `Clustering_files` contains the dendrogram figures created in `vignette-clustering.qmd`
+    
+
+## References:
 
 -   [Hierarchical Clustering](https://www.statology.org/hierarchical-clustering-in-r/)
 
