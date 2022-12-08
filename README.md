@@ -15,7 +15,7 @@ Clustering is an unsupervised machine learning model that involves grouping obse
     -   `winequality-white.csv` contains 12 physicochemical test measures for 4,898 wines
     -   `clean-winequality.RData` contains the scaled data from winequality-white.csv with missing values removed.
 -   `scripts` -
-    -   `primarydocument-clustering.Rmd`
+    -   `primarydocument-clustering.Rmd` contains the code used in `vignette-clustering.qmd`
     -   `drafts` contains scratchwork files `scratchwork-ashley.R`, `scratchwork-hierarchial.R`, and `scratchwork-kmeans.Rmd`
     -   `Clustering_files` contains the dendrogram figures created in `vignette-clustering.qmd`
     
