@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.189">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Ashley Son, Hannah Li, Ryan Quon, Alex Lim">
+
+<title>Clustering Vignette</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="vignette-clustering_files/libs/clipboard/clipboard.min.js"></script>
+<script src="vignette-clustering_files/libs/quarto-html/quarto.js"></script>
+<script src="vignette-clustering_files/libs/quarto-html/popper.min.js"></script>
+<script src="vignette-clustering_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="vignette-clustering_files/libs/quarto-html/anchor.min.js"></script>
+<link href="vignette-clustering_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="vignette-clustering_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="vignette-clustering_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="vignette-clustering_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="vignette-clustering_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Clustering Vignette</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Ashley Son, Hannah Li, Ryan Quon, Alex Lim </p>
+          </div>
+  </div>
+    
+    
+  </div>
+  
+
+</header>
+
+<section id="clustering-methods" class="level1">
+<h1>Clustering Methods</h1>
+<blockquote class="blockquote">
+<h3 id="objectives" class="anchored">Objectives</h3>
+<ul>
+<li>Hierarchical clustering - <code>agnes()</code> function - Different linkages (complete, single, average) - Make a dendrogram</li>
+<li>K-means clustering - <code>kmeans()</code> function - Pros and cons</li>
+<li>Plotting Dendrogram using <code>dendextend</code></li>
+</ul>
+</blockquote>
+<hr>
+<p>The data that we’ll work with is the Wine Quality Data Set from the UCI Machine Learning Repository. It consists of 4898 observations of 12 attribute measures based on physiochemical tests:</p>
+<p>1 - fixed acidity</p>
+<p>2 - volatile acidity</p>
+<p>3 - citric acid</p>
+<p>4 - residual sugar</p>
+<p>5 - chlorides</p>
+<p>6 - free sulfur dioxide</p>
+<p>7 - total sulfur dioxide</p>
+<p>8 - density</p>
+<p>9 - pH</p>
+<p>10 - sulphates</p>
+<p>11 - alcohol</p>
+<p>There is one response variable based on sensory data: <code>quality</code>, which is measured by a score between 0 and 10.</p>
+<p>We will use the R package <code>cluster</code>, which provide methods for Cluster analysis.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#REFERENCE: https://uc-r.github.io/kmeans_clustering</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.0.0 ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ broom        1.0.1      ✔ recipes      1.0.1 
+✔ dials        1.0.0      ✔ rsample      1.1.0 
+✔ dplyr        1.0.10     ✔ tibble       3.1.8 
+✔ ggplot2      3.4.0      ✔ tidyr        1.2.1 
+✔ infer        1.0.3      ✔ tune         1.0.0 
+✔ modeldata    1.0.1      ✔ workflows    1.1.0 
+✔ parsnip      1.0.1      ✔ workflowsets 1.0.0 
+✔ purrr        0.3.4      ✔ yardstick    1.1.0 </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
+✖ purrr::discard() masks scales::discard()
+✖ dplyr::filter()  masks stats::filter()
+✖ dplyr::lag()     masks stats::lag()
+✖ recipes::step()  masks stats::step()
+• Search for functions across packages at https://www.tidymodels.org/find/</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(readr) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: readr</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'readr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:yardstick':
+
+    spec</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:scales':
+
+    col_factor</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(factoextra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: factoextra</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa</code></pre>
+</div>
+</div>
+<section id="hierarchical-clustering" class="level2">
+<h2 class="anchored" data-anchor-id="hierarchical-clustering">Hierarchical Clustering</h2>
+<p>In data mining and statistics, hierarchical clustering is a method of cluster analysis that seeks to build a hierarchy of clusters.</p>
+<p>At a closer glance, the observations in our raw data file, <code>winequality-white.csv</code>, are separated by semicolons. We load in our data file in the chunk below, and eliminate any <code>NA</code> values.</p>
+<p>We also use the function <code>scale()</code>, which centers and scales the columns of a numeric matrix. By default, its arguments <code>center</code> and <code>scale</code> are both set to <code>TRUE</code>. If <code>center=TRUE</code>, centering is done by subtracting the column means of the data from their corresponding columns. If <code>scale=TRUE</code>, then scaling is done by dividing the (centered) columns of the data by their standard deviations (if <code>center =TRUE</code>). This results in each variable having a mean of 0 and standard deviation of 1.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"~/Documents/GitHub/vignette-clustering/data"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>wine <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'winequality-white.csv'</span>, <span class="at">sep=</span><span class="st">';'</span>) </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>wine<span class="ot">&lt;-</span><span class="fu">na.omit</span>(wine) </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>wine2 <span class="ot">&lt;-</span> <span class="fu">scale</span>(wine) </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(wine2) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  fixed.acidity volatile.acidity citric.acid residual.sugar   chlorides
+1     0.1720794      -0.08176155  0.21325843      2.8210611 -0.03535139
+2    -0.6574340       0.21587359  0.04799622     -0.9446688  0.14773200
+3     1.4756004       0.01745016  0.54378284      0.1002720  0.19350284
+4     0.4090832      -0.47860841 -0.11726599      0.4157258  0.55966962
+5     0.4090832      -0.47860841 -0.11726599      0.4157258  0.55966962
+6     1.4756004       0.01745016  0.54378284      0.1002720  0.19350284
+  free.sulfur.dioxide total.sulfur.dioxide      density          pH   sulphates
+1           0.5698734            0.7444890  2.331273996 -1.24679399 -0.34914861
+2          -1.2528907           -0.1496693 -0.009153237  0.73995309  0.00134171
+3          -0.3121093           -0.9732363  0.358628185  0.47505348 -0.43677119
+4           0.6874711            1.1209768  0.525801559  0.01147916 -0.78726151
+5           0.6874711            1.1209768  0.525801559  0.01147916 -0.78726151
+6          -0.3121093           -0.9732363  0.358628185  0.47505348 -0.43677119
+     alcohol   quality
+1 -1.3930102 0.1378561
+2 -0.8241915 0.1378561
+3 -0.3366326 0.1378561
+4 -0.4991523 0.1378561
+5 -0.4991523 0.1378561
+6 -0.3366326 0.1378561</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(wine2, <span class="at">file =</span> <span class="st">"clean-winequality.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Hierarchical clustering is a method of clustering that requires a pre-specified number of clusters <span class="math inline">k</span>. Hierarchical clustering additionally produces a dendrogram, a tree-like representation of the similarity between observations,</p>
+<p>It is an unsupervised learning technique to divide a data set into clusters of observations, where each cluster contains observations that are ‘close’ to each other and clusters are ‘far’ from each other by a certain measure.</p>
+<p>We will initially begin by using a sample 50 observations from the wine data set to make our visualizations (dendrograms) simpler.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>) </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>w_ind <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(wine2),<span class="dv">50</span>,<span class="at">replace =</span> F) </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>winecut <span class="ot">&lt;-</span> wine2[w_ind,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We will use the <code>agnes()</code> function from cluster package in R which computes agglomerative hierarchical clustering of the data. This function has two arguments, <code>data</code>, and <code>method</code>, which is a character string specifying the clustering method:</p>
+<ul>
+<li><p><code>"average"</code>: default method</p></li>
+<li><p><code>"single"</code>: single linkage</p></li>
+<li><p><code>"complete"</code>: complete linkage</p></li>
+<li><p><code>"ward"</code>: Ward’s method</p></li>
+<li><p><code>"weighted"</code>: weighted average linkage and its generalization <code>"flexible"</code></p></li>
+<li><p><code>"gaverage"</code>: a generalized <code>"average"</code></p></li>
+</ul>
+<p>Since we don’t know beforehand which method will produce the best clusters, we can write a short function below to perform hierarchical clustering using several different methods. The function computes the agglomerative coefficient of each clustering method, which measures the strength of the clusters. The closer this value is to 1, the stronger the clusters are.</p>
+<section id="step-1-find-the-linkage-method-to-use" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-find-the-linkage-method-to-use">Step 1: Find the Linkage Method to Use</h3>
+<p>We first define the linkage methods we will run through the function, then calculate agglomerative coefficient for each clustering linkage method in the chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">"average"</span>, <span class="st">"single"</span>, <span class="st">"complete"</span>, <span class="st">"ward"</span>) </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(m) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">"average"</span>, <span class="st">"single"</span>, <span class="st">"complete"</span>, <span class="st">"ward"</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>ac <span class="ot">&lt;-</span> <span class="cf">function</span>(x) { <span class="fu">agnes</span>(winecut, <span class="at">method =</span> x)<span class="sc">$</span>ac }</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(m, ac)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  average    single  complete      ward 
+0.6399131 0.4109914 0.7274697 0.8241716 </code></pre>
+</div>
+</div>
+<p>We can see that Ward’s minimum variance method produces the highest agglomerative coefficient, thus we’ll use that as the method for our final hierarchical clustering, which is performed in the chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a> clust <span class="ot">&lt;-</span> <span class="fu">agnes</span>(winecut, <span class="at">method =</span> <span class="st">"ward"</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">pltree</span>(clust, <span class="at">cex =</span> <span class="fl">0.6</span>, <span class="at">hang =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">main =</span> <span class="st">"Dendrogram"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette-clustering_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We have so far only worked with the sample of 50 observations from the original <code>wine2</code> data set. We now test various linkage methods on the whole <code>wine2</code> data set in the chunk below and produce a dendrogram based on Ward’s linkage method.</p>
+<p>Each leaf at the bottom of the dendrogram represents an observation in the data set. As we move up the dendrogram from the bottom, observations that are similar to each other are fused together into a branch.</p>
+<p>We will now find the linkage method for the original data set. Due to the high number of observations within the original data set, the leafs of the dendrogram will be cluttered.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">"average"</span>, <span class="st">"single"</span>, <span class="st">"complete"</span>, <span class="st">"ward"</span>) </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(m) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">"average"</span>, <span class="st">"single"</span>, <span class="st">"complete"</span>, <span class="st">"ward"</span>) </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>ac2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) { <span class="fu">agnes</span>(wine2, <span class="at">method =</span> x)<span class="sc">$</span>ac } </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(m, ac2) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  average    single  complete      ward 
+0.9590064 0.9452671 0.9689056 0.9933460 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>clust2 <span class="ot">&lt;-</span> <span class="fu">agnes</span>(wine2, <span class="at">method =</span> <span class="st">"ward"</span>) </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pltree</span>(clust2, <span class="at">cex =</span> <span class="fl">0.3</span>, <span class="at">hang =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">main =</span> <span class="st">"Dendrogram"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette-clustering_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="step-2-determine-the-optimal-number-of-clusters" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-determine-the-optimal-number-of-clusters">Step 2: Determine the Optimal Number of Clusters</h3>
+<p>We will be calculating the optimal number of clusters on the whole <code>wine2</code> data set using the gap statistic, which compares the total intra-cluster variation for different values of <span class="math inline">k</span> with their expected values for a distribution with no clustering, to determine how many clusters the observations should be grouped in</p>
+<p>We can calculate the gap statistic for each number of clusters using the <code>clusGap()</code> function from the cluster package along with a plot of Clusters vs.&nbsp;Gap Statistic using the <code>fviz_gap_stat()</code> function</p>
+<p>We calculate the gap statistic for each number of clusters (up to 10 clusters) in the code below:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>gap_stat <span class="ot">&lt;-</span> <span class="fu">clusGap</span>(wine2, <span class="at">FUN =</span> hcut, <span class="at">nstart =</span> <span class="dv">25</span>, <span class="at">K.max =</span> <span class="dv">10</span>, <span class="at">B =</span> <span class="dv">50</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_gap_stat</span>(gap_stat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette-clustering_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We observe that the gap statistic is highest at <span class="math inline">k=3</span> Thus, we select <span class="math inline">k=3</span> clusters to divide our data set.</p>
+</section>
+<section id="step-3-apply-cluster-labels-to-original-data-set" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-apply-cluster-labels-to-original-data-set">Step 3: Apply cluster labels to original data set</h3>
+<p>To actually add cluster labels to each observation in our data set, we can use the <code>cutree()</code> method to cut the dendrogram into 3 clusters:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">dist</span>(wine2, <span class="at">method =</span> <span class="st">"euclidean"</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>final_clust <span class="ot">&lt;-</span> <span class="fu">hclust</span>(d, <span class="at">method =</span> <span class="st">"ward.D2"</span> )</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>groups <span class="ot">&lt;-</span> <span class="fu">cutree</span>(final_clust, <span class="at">k=</span><span class="dv">3</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>final_data <span class="ot">&lt;-</span> <span class="fu">cbind</span>(wine, <span class="at">cluster =</span> groups)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(final_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  fixed.acidity volatile.acidity citric.acid residual.sugar chlorides
+1           7.0             0.27        0.36           20.7     0.045
+2           6.3             0.30        0.34            1.6     0.049
+3           8.1             0.28        0.40            6.9     0.050
+4           7.2             0.23        0.32            8.5     0.058
+5           7.2             0.23        0.32            8.5     0.058
+6           8.1             0.28        0.40            6.9     0.050
+  free.sulfur.dioxide total.sulfur.dioxide density   pH sulphates alcohol
+1                  45                  170  1.0010 3.00      0.45     8.8
+2                  14                  132  0.9940 3.30      0.49     9.5
+3                  30                   97  0.9951 3.26      0.44    10.1
+4                  47                  186  0.9956 3.19      0.40     9.9
+5                  47                  186  0.9956 3.19      0.40     9.9
+6                  30                   97  0.9951 3.26      0.44    10.1
+  quality cluster
+1       6       1
+2       6       2
+3       6       2
+4       6       2
+5       6       2
+6       6       2</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="k-means-clustering" class="level2">
+<h2 class="anchored" data-anchor-id="k-means-clustering">K-means Clustering</h2>
+<p>K-means clustering is an unsupervised learning method in machine learning (there is no response variable to evaluate the model off of). This method is used to group data points into K clusters where K is a tuning parameter chosen by the user. After initially randomly assigning data points to a cluster, the model iterates until the clusters are settled into their respective groups. The clustering is determined by the distance from the center of each cluster. The function used for k-means clustering is <code>kmeans()</code> found in the stats package.</p>
+</section>
+<section id="step-1-pick-distance-measure" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-pick-distance-measure">Step 1: Pick distance measure</h2>
+<p>In order to classify observations into clusters, we need to calculate the distance between each pair of observations. Each distance measure will yield different results so it is crucial that you choose these carefully.</p>
+<p>The first method I will go over is the distance between two points in Euclidean space, Euclidean Distance:</p>
+<p><span class="math display">d(x,y)=\sqrt{\sum_{i=1}^{n} (x_i-y_i)^2}</span></p>
+<p>This method is the most common and will most often be the default distance measure. Euclidean distance is often ideal since it will minimize squared errors, or in the context of K-means, minimize within-cluster variance. Alternatively, there is a close relative we can use: Manhattan Distance:</p>
+<p><span class="math display">d(x,y)={\sum_{i=1}^{n} |(x_i-y_i)|}</span></p>
+<p>This distance measure is far less common and should only be used when your data has high dimensionality. Other than these two approaches, you can also use correlation measures such as Pearson correlation distance or Spearman correlation distance. For this data, we will be using the Euclidean Distance.</p>
+<p>In order to calculate the Euclidean matrix, we will use the <code>get_dist</code> function from the <code>factoextra</code> package. We can alter the distance measure by changing the <code>method</code> argument.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Pick distance measure, here I use Euclidean from the factoextra R package </span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("factoextra")</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co">#uses euclidean distance</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>distance <span class="ot">&lt;-</span> <span class="fu">get_dist</span>(winecut, <span class="at">method =</span> <span class="st">"euclidean"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now that we have the distances. It may be helpful to visualize them. The below code uses the fviz_dist() function to graph the distances between each subject.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#fviz_dist allows us to visualize the distance</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_dist</span>(distance, <span class="at">gradient =</span> <span class="fu">list</span>(<span class="at">low =</span> <span class="st">"#00AFBB"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"#FC4E07"</span>),<span class="at">show_labels =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette-clustering_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="step-2-creating-clusters" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-creating-clusters">Step 2: Creating clusters</h2>
+<p>As aforementioned, the goal of kmeans clustering is to decrease the inter-cluster variation as much as possible so that the members of each cluster are as similar as possible. In order to do this, we should know that each cluster is represented by the mean of all its points, known as the centroid. The standard way to create clusters is using the Hartigan-Wong algorithm summarized in the following steps:</p>
+<ol type="1">
+<li><p>Partition data into <em>k</em> sets</p></li>
+<li><p>Randomly assign all of the data points to a centroid and calculate the respective means</p></li>
+<li><p>For a datapoint <span class="math inline">d_i</span> select a centroid <span class="math inline">c_i</span><em>.</em> Assign <span class="math inline">d_i</span> to <span class="math inline">c_i</span> and compute the sum of squared distances. Then, repeat for every every centroid. After, assign <span class="math inline">d_i</span> to the centroid with the smallest sum. Finally, recalculate the new centroid means.</p></li>
+<li><p>Repeat step 3 for every data point until convergence</p></li>
+</ol>
+<p>Now that we have an idea of how the algorithm works, we can use it. Here, we are setting <code>centers = 2</code> to form two different clusters. Additionally, the <code>nstart</code> option will create <em>n</em> initial configurations; the best of which is chosen. In this instance, there are 30 initial configurations, <code>nstart = 30</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>kmeans2 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(winecut, <span class="at">centers =</span> <span class="dv">2</span>, <span class="at">nstart =</span> <span class="dv">30</span>) <span class="co">#labeled kmeans 2 since we have 2 clusters. We will use more later</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Below you can see the two clusters, along with the cluster means</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>kmeans2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>K-means clustering with 2 clusters of sizes 14, 36
+
+Cluster means:
+  fixed.acidity volatile.acidity citric.acid residual.sugar  chlorides
+1     0.3836900      -0.06404518  0.82118726      1.3402590  0.8310254
+2    -0.3183869      -0.01699835 -0.08283636     -0.3542882 -0.2158920
+  free.sulfur.dioxide total.sulfur.dioxide    density          pH sulphates
+1           0.6496718            0.6688553  1.3167704 -0.68388231 0.2704682
+2          -0.3594750           -0.3941249 -0.4165919  0.02251665 0.1327756
+     alcohol    quality
+1 -1.0099282 -0.5073604
+2  0.2558868  0.1378561
+
+Clustering vector:
+3786  503 3430 3696 4090 3052 2967  470 1990 1540  823 2886 4279 2347 2514 2956 
+   2    2    1    2    2    1    1    1    2    2    2    2    2    1    2    2 
+3043 1331  456 3218 1817 3507 4606  948 3632  288  347 1808 4890  605 3742 4829 
+   1    2    2    2    2    2    2    2    2    1    2    1    2    2    1    1 
+1631  223 1449 3369 4598 4615 4545 2441 4756 2411 1624 2931 2478 3326 2095 4804 
+   2    2    2    2    2    1    2    1    2    2    2    2    2    2    1    2 
+2060  947 
+   2    1 
+
+Within cluster sum of squares by cluster:
+[1] 151.0747 331.2271
+ (between_SS / total_SS =  21.3 %)
+
+Available components:
+
+[1] "cluster"      "centers"      "totss"        "withinss"     "tot.withinss"
+[6] "betweenss"    "size"         "iter"         "ifault"      </code></pre>
+</div>
+</div>
+<p>This output gives us a lot of important data like the clusters in which each point is allocated, the center of all clusters, etc. As you can see, our wines were separated into clusters of sizes 28 and 22. The sum of squares for cluster 1 is 14913.96 and the sum of squares for cluster 2 is 20172.84. However, it may be easier to just look at a graph</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#remember to remove labels</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(kmeans2, <span class="at">data =</span> winecut, <span class="at">geom=</span><span class="fu">c</span>(<span class="st">"point"</span>))<span class="co">#ensure geom is only equal to point, otherwise we will have labels</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette-clustering_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We can see from the graph that there is no overlap between the two clusters which is ideal. However, there seems to be a lot of data points, especially with the second cluster, that are far from the centroid. This leads me to believe we can further increase the number of sets <em>k.</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>kmeans3 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(winecut, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">30</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>kmeans4 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(winecut, <span class="at">centers =</span> <span class="dv">4</span>, <span class="at">nstart =</span> <span class="dv">30</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>kmeans5 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(winecut, <span class="at">centers =</span> <span class="dv">5</span>, <span class="at">nstart =</span> <span class="dv">30</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plots to compare for different ks</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">fviz_cluster</span>(kmeans2, <span class="at">geom =</span> <span class="st">"point"</span>, <span class="at">data =</span> winecut) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"k = 2"</span>)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">fviz_cluster</span>(kmeans3, <span class="at">geom =</span> <span class="st">"point"</span>,  <span class="at">data =</span> winecut) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"k = 3"</span>)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> <span class="fu">fviz_cluster</span>(kmeans4, <span class="at">geom =</span> <span class="st">"point"</span>,  <span class="at">data =</span> winecut) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"k = 4"</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> <span class="fu">fviz_cluster</span>(kmeans5, <span class="at">geom =</span> <span class="st">"point"</span>,  <span class="at">data =</span> winecut) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"k = 5"</span>)</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'gridExtra'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dplyr':
+
+    combine</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(p1, p2, p3, p4, <span class="at">nrow =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette-clustering_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As you can see, with 3 clusters, our data clusters are already begin to overlap with each other. At values <em>k</em> =4 and <em>k</em> = 5, we have clusters with extremely few points. From this, we likely want the number of clusters to be 2 or 3. However, to make sure, there are several methods of finding the optimal amount of clusters.</p>
+</section>
+<section id="step-3-find-optimal-amount-of-clusters" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-find-optimal-amount-of-clusters">Step 3: Find optimal amount of clusters</h2>
+<p>The following methods are useful for aiding you in finding the optimal amount of clusters.</p>
+<ol type="1">
+<li><p>Elbow Method</p>
+<p>The elbow method tells us the total within-clusters sum of squares for every cluster <em>c.</em> Ideally, we will choose the part of the graph where an “elbow” shape forms</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co">#So, Which is best? There are three methods we can use </span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co">#ELBOW</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(winecut, kmeans, <span class="at">method =</span> <span class="st">"wss"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette-clustering_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The closest we have to an “elbow” shape on this graph is from <em>k</em> = 2 or <em>k</em> = 3.</p>
+<ol start="2" type="1">
+<li><p>Average Silhouette Method</p>
+<p>This method determines the quality of clustering, or in other words, how well an object fits inside its cluster. For each k, every data point is given a silhouette coefficient, a score that evaluates how similar a data point is within-cluster compared to out of cluster which is then averaged. We want our optimal cluster to maximize the average silhouette score.</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#SILHOUETTE</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(winecut, kmeans,<span class="at">method =</span> <span class="st">"silhouette"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette-clustering_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Clustering with <em>k</em> = 2 seems to yield the best results by a rather significant margin. There seems to be large tradeoff between adding more clusters and the average silhouette score.</p>
+<ol start="3" type="1">
+<li><p>Gap Statistic Method</p>
+<p>This was the previous method used to find the optimal number of clusters in hierarchical clustering. For each value <em>k</em>, the gap statistic finds the difference between the actual within-cluster variation and the expected within-cluster variation (from a random cluster). We want a high gap-statistic.</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co">#GAP STATISTICS</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>gap_stat <span class="ot">&lt;-</span> <span class="fu">clusGap</span>(winecut, <span class="at">FUN =</span> kmeans, <span class="at">nstart =</span> <span class="dv">30</span>,</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">K.max =</span> <span class="dv">10</span>, <span class="at">B =</span> <span class="dv">50</span>)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(gap_stat, <span class="at">method =</span> <span class="st">"firstmax"</span>)<span class="co">#first max givesuse the location of the first local maximum</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Clustering Gap statistic ["clusGap"] from call:
+clusGap(x = winecut, FUNcluster = kmeans, K.max = 10, B = 50, nstart = 30)
+B=50 simulated reference sets, k = 1..10; spaceH0="scaledPCA"
+ --&gt; Number of clusters (method 'firstmax'): 1
+          logW   E.logW       gap     SE.sim
+ [1,] 4.072692 4.386117 0.3134251 0.02872119
+ [2,] 3.944950 4.229623 0.2846730 0.02495735
+ [3,] 3.861807 4.146111 0.2843040 0.02317165
+ [4,] 3.794285 4.076440 0.2821549 0.02333009
+ [5,] 3.739167 4.017923 0.2787564 0.02267713
+ [6,] 3.679269 3.964089 0.2848199 0.02229025
+ [7,] 3.625991 3.913474 0.2874828 0.02220336
+ [8,] 3.573804 3.865194 0.2913896 0.02230278
+ [9,] 3.520659 3.819504 0.2988447 0.02351003
+[10,] 3.469026 3.774972 0.3059462 0.02418557</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_gap_stat</span>(gap_stat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette-clustering_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">#2 clusters seems to be the best!!! !</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>According to this method, the optimal amount of clusters is 1; however, this is rather impractical for the sake of our analysis. Because both of the previous optimization methods suggested k = 2, that will be the final amount of clusters we will use.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>final <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(winecut, <span class="at">centers =</span> <span class="dv">2</span>, <span class="at">nstart =</span> <span class="dv">30</span>) <span class="co">#labeled kmeans 2 since we have 2 clusters. We will use more later</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(final, <span class="at">data =</span> winecut, <span class="at">geom=</span><span class="fu">c</span>(<span class="st">"point"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette-clustering_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
