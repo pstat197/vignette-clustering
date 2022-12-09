@@ -2,7 +2,7 @@
 title: "Clustering Vignette"
 author: "Ashley Son, Hannah Li, Ryan Quon, Alex Lim" 
 format: html
-    html-math-method: katex
+html-math-method: katex
 editor: visual
 ---
 
@@ -177,7 +177,7 @@ This method is the most common and will most often be the default distance measu
 
 $$d(x,y)={\sum_{i=1}^{n} |(x_i-y_i)|}$$
 
-This distance measure is far less common and should only be used when your data has high dimensionality. Other than these two approaches, you can also use correlation measures such as Pearson correlation distance or Spearman correlation distance.
+This distance measure is far less common and should only be used when your data has high dimensionality. Other than these two approaches, you can also use correlation measures such as Pearson correlation distance or Spearman correlation distance. For this data, we will be using the Euclidean Distance.
 
 In order to calculate the Euclidean matrix, we will use the `get_dist` function from the `factoextra` package. We can alter the distance measure by changing the `method` argument.
 
@@ -198,9 +198,9 @@ fviz_dist(distance, gradient = list(low = "#00AFBB", mid = "white", high = "#FC4
 
 ## Step 2: Creating clusters
 
-Just in case you forgot, the goal of kmeans clustering is to decrease the inter-cluster variation as much as possible so that the members of each cluster are as similar as possible. Each cluster is represented by the mean of all its points, known as the centroid. The standard way to do this is using the Hartigan-Wong algorithm summarized in the following steps:
+As aforementioned, the goal of kmeans clustering is to decrease the inter-cluster variation as much as possible so that the members of each cluster are as similar as possible. In order to do this, we should know that each cluster is represented by the mean of all its points, known as the centroid. The standard way to create clusters is using the Hartigan-Wong algorithm summarized in the following steps:
 
-1.  Partition data into random *k* sets
+1.  Partition data into *k* sets
 
 2.  Randomly assign all of the data points to a centroid and calculate the respective means
 
@@ -208,7 +208,7 @@ Just in case you forgot, the goal of kmeans clustering is to decrease the inter-
 
 4.  Repeat step 3 for every data point until convergence
 
-Now that we have an idea of how the algorithm works, we can use it. Here, we are setting `centers = 2` to form two different clusters. Additionally, the `nstart` option will create *n* initial figurations; the best of the initial figurations is chosen. In this instance, there are 30 intial configurations, `nstart = 30`.
+Now that we have an idea of how the algorithm works, we can use it. Here, we are setting `centers = 2` to form two different clusters. Additionally, the `nstart` option will create *n* initial configurations; the best of which is chosen. In this instance, there are 30 initial configurations, `nstart = 30`.
 
 ```{r}
 kmeans2 <- kmeans(winecut, centers = 2, nstart = 30) #labeled kmeans 2 since we have 2 clusters. We will use more later
@@ -247,7 +247,7 @@ grid.arrange(p1, p2, p3, p4, nrow = 2)
 
 As you can see, with 3 clusters, our data clusters are already begin to overlap with each other. At values *k* =4 and *k* = 5, we have clusters with extremely few points. From this, we likely want the number of clusters to be 2 or 3. However, to make sure, there are several methods of finding the optimal amount of clusters.
 
-## Step 2: Find optimal amount of clusters
+## Step 3: Find optimal amount of clusters
 
 The following methods are useful for aiding you in finding the optimal amount of clusters.
 
@@ -265,7 +265,7 @@ The closest we have to an "elbow" shape on this graph is from *k* = 2 or *k* = 3
 
 2.  Average Silhouette Method
 
-    This method determines the quality of clustering, or in other words, how well an object fits inside its cluster. For each k, every data point is given a silhouette coefficient, a score that evaluates how similar a data point is within-cluster compared to out of cluster, which is then averaged. We want our optimal cluster to maximize the average silhouette score.
+    This method determines the quality of clustering, or in other words, how well an object fits inside its cluster. For each k, every data point is given a silhouette coefficient, a score that evaluates how similar a data point is within-cluster compared to out of cluster which is then averaged. We want our optimal cluster to maximize the average silhouette score.
 
 ```{r}
 #SILHOUETTE
@@ -289,6 +289,7 @@ fviz_gap_stat(gap_stat)
 ```
 
 According to this method, the optimal amount of clusters is 1; however, this is rather impractical for the sake of our analysis. Because both of the previous optimization methods suggested k = 2, that will be the final amount of clusters we will use.
+
 ```{r}
 final <- kmeans(winecut, centers = 2, nstart = 30) #labeled kmeans 2 since we have 2 clusters. We will use more later
 
