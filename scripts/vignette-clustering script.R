@@ -164,4 +164,4 @@ fviz_gap_stat(gap_stat)
 
 final <- kmeans(winecut, centers = 2, nstart = 30) #labeled kmeans 2 since we have 2 clusters. We will use more later
 
-fviz_cluster(final, data = winecut, geom=c("point"))
+fviz_cluster(final, data = winecut, geom=c("point")) 
