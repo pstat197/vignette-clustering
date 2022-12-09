@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ------------------------------------------------------------------------
 
-The data that we'll work with is the Wine Quality Data Set from the UCI Machine Learning Repository. It consists of 4898 observations of 12 attribute measures based on phsysio-chemical tests:
+The data that we'll work with is the Wine Quality Data Set from the UCI Machine Learning Repository. It consists of 4898 observations of 12 attribute measures based on physiochemical tests:
 
 1 - fixed acidity
 
@@ -60,7 +60,7 @@ require(factoextra)
 
 In data mining and statistics, hierarchical clustering is a method of cluster analysis that seeks to build a hierarchy of clusters.
 
-At a closer glance, the observations in our raw data file, 'winequality-white.csv', are separated by semicolons. We load in our data file in the chunk below, and eliminate any `NA` values.
+At a closer glance, the observations in our raw data file, `winequality-white.csv`, are separated by semicolons. We load in our data file in the chunk below, and eliminate any `NA` values.
 
 We also use the function `scale()`, which centers and scales the columns of a numeric matrix. By default, its arguments `center` and `scale` are both set to `TRUE`. If `center=TRUE`, centering is done by subtracting the column means of the data from their corresponding columns. If `scale=TRUE`, then scaling is done by dividing the (centered) columns of the data by their standard deviations (if `center =TRUE`). This results in each variable having a mean of 0 and standard deviation of 1.
 
@@ -73,7 +73,7 @@ head(wine2)
 save(wine2, file = "clean-winequality.RData")
 ```
 
-Hierarchical clustering is a method of clustering that requires a pre-specified number of clusters $K$. Hierarchical clustering additionally produces a dendrogram, a tree-like representation of the similarity between observations,
+Hierarchical clustering is a method of clustering that requires a pre-specified number of clusters $k$. Hierarchical clustering additionally produces a dendrogram, a tree-like representation of the similarity between observations,
 
 It is an unsupervised learning technique to divide a data set into clusters of observations, where each cluster contains observations that are 'close' to each other and clusters are 'far' from each other by a certain measure.
 
