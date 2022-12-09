@@ -196,7 +196,9 @@ Now that we have the distances. It may be helpful to visualize them. The below c
 fviz_dist(distance, gradient = list(low = "#00AFBB", mid = "white", high = "#FC4E07"),show_labels = FALSE)
 ```
 
-Just in case you forgot, the goal of kmeans clustering is to decrease the inter-cluster variation as much as possible so that the members of each cluster are as similar as possible. Each cluster is represented by the mean of all point, known as the centroid. The standard way to do this is using the Hartigan-Wong algorithm summarized in the following steps:
+## Step 2: Creating clusters
+
+Just in case you forgot, the goal of kmeans clustering is to decrease the inter-cluster variation as much as possible so that the members of each cluster are as similar as possible. Each cluster is represented by the mean of all its points, known as the centroid. The standard way to do this is using the Hartigan-Wong algorithm summarized in the following steps:
 
 1.  Partition data into random *k* sets
 
@@ -226,12 +228,14 @@ fviz_cluster(kmeans2, data = winecut, geom=c("point"))#ensure geom is only equal
 
 ```
 
+We can see from the graph that there is no overlap between the two clusters which is ideal. However, there seems to be a lot of data points, especially with the second cluster, that are far from the centroid. This leads me to believe we can further increase the number of sets *k.*
+
 ```{r}
 kmeans3 <- kmeans(winecut, centers = 3, nstart = 30)
 kmeans4 <- kmeans(winecut, centers = 4, nstart = 30)
 kmeans5 <- kmeans(winecut, centers = 5, nstart = 30)
 
-# plots to compare
+# plots to compare for different ks
 p1 <- fviz_cluster(kmeans2, geom = "point", data = winecut) + ggtitle("k = 2")
 p2 <- fviz_cluster(kmeans3, geom = "point",  data = winecut) + ggtitle("k = 3")
 p3 <- fviz_cluster(kmeans4, geom = "point",  data = winecut) + ggtitle("k = 4")
@@ -241,17 +245,52 @@ library(gridExtra)
 grid.arrange(p1, p2, p3, p4, nrow = 2)
 ```
 
+As you can see, with 3 clusters, our data clusters are already begin to overlap with each other. At values *k* =4 and *k* = 5, we have clusters with extremely few points. From this, we likely want the number of clusters to be 2 or 3. However, to make sure, there are several methods of finding the optimal amount of clusters.
+
+## Step 2: Find optimal amount of clusters
+
+The following methods are useful for aiding you in finding the optimal amount of clusters.
+
+1.  Elbow Method
+
+    The elbow method tells us the total within-clusters sum of squares for every cluster *c.* Ideally, we will choose the part of the graph where an "elbow" shape forms
+
 ```{r}
 #So, Which is best? There are three methods we can use 
 #ELBOW
 fviz_nbclust(winecut, kmeans, method = "wss")
+```
+
+The closest we have to an "elbow" shape on this graph is from *k* = 2 or *k* = 3.
+
+2.  Average Silhouette Method
+
+    This method determines the quality of clustering, or in other words, how well an object fits inside its cluster. For each k, every data point is given a silhouette coefficient, a score that evaluates how similar a data point is within-cluster compared to out of cluster, which is then averaged. We want our optimal cluster to maximize the average silhouette score.
+
+```{r}
 #SILHOUETTE
 fviz_nbclust(winecut, kmeans,method = "silhouette")
+```
+
+Clustering with *k* = 2 seems to yield the best results by a rather significant margin. There seems to be large tradeoff between adding more clusters and the average silhouette score.
+
+3.  Gap Statistic Method
+
+    This was the previous method used to find the optimal number of clusters in hierarchical clustering. For each value *k*, the gap statistic finds the difference between the actual within-cluster variation and the expected within-cluster variation (from a random cluster). We want a high gap-statistic.
+
+```{r}
 #GAP STATISTICS
 
 gap_stat <- clusGap(winecut, FUN = kmeans, nstart = 30,
                     K.max = 10, B = 50)
-print(gap_stat, method = "firstmax")
+print(gap_stat, method = "firstmax")#first max givesuse the location of the first local maximum
 fviz_gap_stat(gap_stat)
 #2 clusters seems to be the best!!! !
+```
+
+According to this method, the optimal amount of clusters is 1; however, this is rather impractical for the sake of our analysis. Because both of the previous optimization methods suggested k = 2, that will be the final amount of clusters we will use.
+```{r}
+final <- kmeans(winecut, centers = 2, nstart = 30) #labeled kmeans 2 since we have 2 clusters. We will use more later
+
+fviz_cluster(final, data = winecut, geom=c("point"))
 ```
