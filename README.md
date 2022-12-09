@@ -7,7 +7,7 @@
 
 ## Abstract: 
 
-Clustering is an unsupervised machine learning model that involves grouping observations using various algorithms. This vignette covers 2 clustering methods: Hierarchical and K-means clustering. From the University of California, Irvine Machine Learning Repository we obtained our quality of white wine dataset, both Hierarchical and K-means clustering are performed RESULTS HERE [Wine Quality Dataset](https://archive.ics.uci.edu/ml/datasets/Wine+Quality)
+Clustering is an unsupervised machine learning model that involves grouping observations using various algorithms. This vignette covers 2 clustering methods: Hierarchical and K-means clustering. From the University of California, Irvine Machine Learning Repository we obtained our quality of white wine dataset, and performed both Hierarchical and K-means clustering. For Hierarchical clustering, we ultimately used Ward's minimum variance method which produced the highest agglomerative coefficient, and chose 3 clusters to divide our data as this gave the highest gap statistic. For K-means clustering, we chose 2 clusters to divide our data using the elbow method, average silhouette method, and gap statistic method. [Wine Quality Dataset](https://archive.ics.uci.edu/ml/datasets/Wine+Quality)
 
 ## Repository content
 
